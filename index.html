@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yapay Zeka Seslendirici</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0b0c10;
+            --bg-card: rgba(31, 40, 51, 0.4);
+            --accent: #45f3ff;
+            --accent-glow: rgba(69, 243, 255, 0.4);
+            --text-light: #c5c6c7;
+            --text-white: #ffffff;
+            --border: rgba(255, 255, 255, 0.08);
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at 50% 50%, rgba(69, 243, 255, 0.08) 0%, transparent 80%), var(--bg-main);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            width: 100%;
+            max-width: 650px;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+        h1 {
+            color: var(--text-white);
+            font-weight: 800;
+            font-size: 32px;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+            text-align: center;
+        }
+        p.subtitle {
+            text-align: center;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 24px;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-white);
+            margin-bottom: 8px;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            color: var(--text-white);
+            font-family: inherit;
+            font-size: 15px;
+            resize: none;
+            transition: all 0.3s ease;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 15px var(--accent-glow);
+            background: rgba(255, 255, 255, 0.04);
+        }
+        .btn {
+            width: 100%;
+            background: var(--accent);
+            color: #0b0c10;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(69, 243, 255, 0.6);
+        }
+        .btn:disabled {
+            background: #1f2833;
+            color: rgba(255, 255, 255, 0.3);
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .result-panel {
+            margin-top: 30px;
+            padding: 24px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            display: none;
+        }
+        .progress-bar-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 12px 0;
+        }
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+        .player-container {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        audio {
+            width: 100%;
+            outline: none;
+        }
+        .download-link {
+            display: inline-block;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-white);
+            text-decoration: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+        .download-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent);
+        }
+        .status-text {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Yapay Zeka Seslendirici</h1>
+        <p class="subtitle">Metinlerinizi gerçekçi yapay zeka sesine dönüştürün</p>
+        
+        <div class="form-group">
+            <label for="text">Seslendirilecek Metin</label>
+            <textarea id="text" placeholder="Dönüştürmek istediğiniz metni buraya girin..."></textarea>
+        </div>
+        
+        <button id="submitBtn" class="btn">Sesi Üret</button>
+        
+        <div id="resultPanel" class="result-panel">
+            <div id="statusLabel" class="status-text">Lütfen bekleyin...</div>
+            <div class="progress-bar-container">
+                <div id="progressBar" class="progress-bar"></div>
+            </div>
+            
+            <div id="audioWrapper" class="player-container" style="display: none;">
+                <audio id="audioPlayer" controls></audio>
+                <a id="downloadBtn" href="#" download class="download-link">Dosyayı Bilgisayara İndir</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const submitBtn = document.getElementById('submitBtn');
+        const textInput = document.getElementById('text');
+        const resultPanel = document.getElementById('resultPanel');
+        const statusLabel = document.getElementById('statusLabel');
+        const progressBar = document.getElementById('progressBar');
+        const audioWrapper = document.getElementById('audioWrapper');
+        const audioPlayer = document.getElementById('audioPlayer');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        let activeJobId = null;
+
+        submitBtn.addEventListener('click', async () => {
+            const text = textInput.value.trim();
+            if (!text) return;
+
+            submitBtn.disabled = true;
+            resultPanel.style.display = 'block';
+            audioWrapper.style.display = 'none';
+            progressBar.style.width = '10%';
+            statusLabel.textContent = 'İstek gönderiliyor...';
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/api/tts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text })
+                });
+                const data = await response.json();
+                activeJobId = data.job_id;
+                checkStatus();
+            } catch (err) {
+                statusLabel.textContent = 'Bağlantı hatası oluştu.';
+                submitBtn.disabled = false;
+            }
+        });
+
+        async function checkStatus() {
+            if (!activeJobId) return;
+
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/api/tts/${activeJobId}`);
+                const data = await response.json();
+
+                if (data.status === 'queued') {
+                    progressBar.style.width = '30%';
+                    statusLabel.textContent = 'Sıraya alındı...';
+                    setTimeout(checkStatus, 1500);
+                } else if (data.status === 'processing') {
+                    progressBar.style.width = '60%';
+                    statusLabel.textContent = 'Ses sentezleniyor...';
+                    setTimeout(checkStatus, 1500);
+                } else if (data.status === 'completed') {
+                    progressBar.style.width = '100%';
+                    statusLabel.textContent = 'İşlem tamamlandı!';
+                    audioPlayer.src = `http://127.0.0.1:8000${data.audio_url}`;
+                    downloadBtn.href = `http://127.0.0.1:8000${data.audio_url}`;
+                    audioWrapper.style.display = 'flex';
+                    submitBtn.disabled = false;
+                } else {
+                    statusLabel.textContent = 'Ses üretimi başarısız oldu.';
+                    submitBtn.disabled = false;
+                }
+            } catch (err) {
+                statusLabel.textContent = 'Durum kontrolü sırasında hata oluştu.';
+                submitBtn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
